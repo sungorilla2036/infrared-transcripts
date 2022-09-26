@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v3.0.8
         with:
           # A list of files, directories, and wildcard patterns to cache and restore
-          path: ~/nemo_cache_dir/
+          path: /nemo_cache_dir/
           # An explicit key for restoring and saving the cache
           key: ml-model
 
@@ -42,7 +42,7 @@ jobs:
         run: |
           cd Infrared
           yt-dlp --flat-playlist --print id https://youtube.com/playlist?list=PLAJIhnd1mbiD4JdPj7DndVRj3UPN8PzQZ > video_ids.txt
-          NEMO_CACHE_DIR="~/nemo_cache_dir/" python ../download_transcripts.py
+          NEMO_CACHE_DIR="../nemo_cache_dir/" python ../download_transcripts.py
       
       - name: Commit new transcripts
         run: |
