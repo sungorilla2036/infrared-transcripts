@@ -44,15 +44,8 @@ jobs:
           yt-dlp --flat-playlist --print id https://youtube.com/playlist?list=PLAJIhnd1mbiD4JdPj7DndVRj3UPN8PzQZ > video_ids.txt
           NEMO_CACHE_DIR="../nemo_cache_dir/" python ../download_transcripts.py
       
-      - name: Get changed files in Infrared folder
-        id: changed-files-specific
-        uses: tj-actions/changed-files@v31
-        with:
-          files: |
-            Infrared
-
-      - name: Run step if any file(s) in the Infrared folder change
-        if: steps.changed-files-specific.outputs.any_changed == 'true'
+      - name: Add and commit changes to Infrared folder
+        continue-on-error: true
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
