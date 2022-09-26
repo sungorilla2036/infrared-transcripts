@@ -24,7 +24,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Install Python dependencies
-        run: pip install youtube_transcript_api yt-dlp pydub nemo_toolkit['all']
+        run: pip install youtube_transcript_api yt-dlp pydub torch torchvision torchaudio nemo_toolkit['all'] --extra-index-url https://download.pytorch.org/whl/cpu
 
       # Runs a set of commands using the runners shell
       - name: Download new transcripts
