@@ -23,7 +23,7 @@ jobs:
         run: sudo apt-get install -y ffmpeg
 
       - name: Install yt-dlp
-      - run: pip install yt-dlp
+        run: pip install yt-dlp
 
       - name: Cache For Downloaded Livestream
         uses: actions/cache@v3.0.8
