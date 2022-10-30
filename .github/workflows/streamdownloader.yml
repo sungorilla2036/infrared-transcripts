@@ -22,10 +22,7 @@ jobs:
       - name: Install ffmpeg
         run: sudo apt-get install -y ffmpeg
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
-          cache: 'pip' # caching pip dependencies
+      - name: Install yt-dlp
       - run: pip install yt-dlp
 
       - name: Cache For Downloaded Livestream
