@@ -31,6 +31,7 @@ jobs:
 
       - name: Cache ML model
         uses: actions/cache@v3.0.8
+        timeout-minutes: 1
         with:
           # A list of files, directories, and wildcard patterns to cache and restore
           path: nemo_cache_dir
