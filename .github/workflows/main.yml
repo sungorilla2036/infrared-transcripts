@@ -43,15 +43,15 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Download new transcripts
         run: |
-          cd Infrared
+          cd public/transcripts/Infrared
           yt-dlp --flat-playlist --print id https://youtube.com/playlist?list=PLAJIhnd1mbiD4JdPj7DndVRj3UPN8PzQZ > video_ids.txt
-          NEMO_CACHE_DIR="../nemo_cache_dir/" python ../download_transcripts.py
+          NEMO_CACHE_DIR="../../../nemo_cache_dir/" python ../download_transcripts.py
       
       - name: Add and commit changes to Infrared folder
         continue-on-error: true
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add Infrared
+          git add public
           git commit -m "Update transcripts"
           git push
