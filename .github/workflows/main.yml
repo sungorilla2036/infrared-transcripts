@@ -25,12 +25,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libsndfile1 ffmpeg
-      - uses: actions/setup-python@v4
+
+      - uses: actions/setup-python@v4.5
         with:
           python-version: '3.7'
           cache: 'pip' # caching pip dependencies
-        working-directory: /scripts
       - run: pip install -r requirements.txt
+        working-directory: /scripts
 
       - name: Cache ML model
         uses: actions/cache@v3.0.8
