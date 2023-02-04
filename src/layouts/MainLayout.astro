@@ -117,10 +117,18 @@ const githubEditUrl = `${GITHUB_EDIT_URL}/${currentFile}`;
 				top: 2rem;
 			}
 		</style>
+		<link href="/_pagefind/pagefind-ui.css" rel="stylesheet">
+		<script is:inline src="/_pagefind/pagefind-ui.js" type="text/javascript"></script>
+		<script is:inline>
+			window.addEventListener('DOMContentLoaded', (event) => {
+				new PagefindUI({ element: "#search" });
+			});
+		</script>
 	</head>
 
 	<body>
 		<Header currentPage={currentPage} />
+		<div id="search"></div>
 		<main class="layout">
 			<aside id="grid-left" class="grid-sidebar" title="Site Navigation">
 				<LeftSidebar currentPage={currentPage} />
