@@ -29,7 +29,8 @@ jobs:
         with:
           python-version: '3.7'
           cache: 'pip' # caching pip dependencies
-      - run: pip install -r "__requirements.txt"
+        working-directory: /scripts
+      - run: pip install -r requirements.txt
 
       - name: Cache ML model
         uses: actions/cache@v3.0.8
@@ -45,7 +46,7 @@ jobs:
         run: |
           cd public/transcripts/Infrared
           yt-dlp --flat-playlist --print id https://youtube.com/playlist?list=PLAJIhnd1mbiD4JdPj7DndVRj3UPN8PzQZ > video_ids.txt
-          NEMO_CACHE_DIR="../../../nemo_cache_dir/" python ../download_transcripts.py
+          NEMO_CACHE_DIR="../../../nemo_cache_dir/" python ../../../scripts/download_transcripts.py
       
       - name: Add and commit changes to Infrared folder
         continue-on-error: true
