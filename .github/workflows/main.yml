@@ -31,7 +31,7 @@ jobs:
           python-version: '3.7'
           cache: 'pip' # caching pip dependencies
       - run: pip install -r requirements.txt
-        working-directory: /scripts
+        working-directory: scripts
 
       - name: Cache ML model
         uses: actions/cache@v3.0.8
