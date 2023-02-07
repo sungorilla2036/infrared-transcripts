@@ -22,7 +22,7 @@ if (data.embedId) {
 	pathComponents[pathComponents.length - 1] = data.embedId;
 	let url = `${Astro.url.origin}/transcripts/${pathComponents.slice(-3).join('/')}.json`;
 	if (import.meta.env.PROD) {
-		url = `./public/transcripts/${pathComponents.slice(-3).join('/')}.json`;
+		url = `/public/transcripts/${pathComponents.slice(-3).join('/')}.json`;
 	}
 	console.log(url);
 	transcript = await fetch(url).then((res) => res.json());
