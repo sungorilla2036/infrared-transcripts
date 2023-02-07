@@ -5,6 +5,13 @@ const docs = defineCollection({
 	schema: z.object({
 		title: z.string().default(SITE.title),
 		description: z.string().default(SITE.description),
+		date: z.date().optional(),
+		platform: z.union([z.literal('youtube'), z.literal('rumble')]).optional(),
+		channelId: z.string().optional(),
+		embedId: z.string().optional(),
+		viewes: z.number().optional(),
+		likes: z.number().optional(),
+		transcript: z.string().optional(),
 		lang: z.literal('en-us').default(SITE.defaultLanguage),
 		dir: z.union([z.literal('ltr'), z.literal('rtl')]).default('ltr'),
 		image: z
@@ -14,6 +21,7 @@ const docs = defineCollection({
 			})
 			.optional(),
 		ogLocale: z.string().optional(),
+		tags: z.array(z.string()).default([]),
 	}),
 });
 

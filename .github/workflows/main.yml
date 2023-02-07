@@ -45,9 +45,9 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Download new transcripts
         run: |
-          cd public/transcripts/Infrared
+          cd public/transcripts/youtube/Infrared
           yt-dlp --flat-playlist --print id https://youtube.com/playlist?list=PLAJIhnd1mbiD4JdPj7DndVRj3UPN8PzQZ > video_ids.txt
-          NEMO_CACHE_DIR="../../../nemo_cache_dir/" python ../../../scripts/download_transcripts.py
+          NEMO_CACHE_DIR="../../../../nemo_cache_dir/" python ../../../../scripts/download_transcripts.py
       
       - name: Add and commit changes to Infrared folder
         continue-on-error: true

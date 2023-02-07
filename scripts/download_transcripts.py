@@ -35,6 +35,32 @@ ACODECS = {
     'wav': ('wav', None, ('-f', 'wav')),
 }
 
+def get_mdx_string(content_info, video_id):
+    if content_info is None:
+        return f"""\
+---
+title: {video_id}
+platform: youtube
+embedId: {video_id}
+---
+"""
+    newline = '\n  - '
+    return f"""\
+---
+title: {content_info['title']}
+date: {content_info['upload_date']}
+platform: youtube
+channelId: {content_info['channel_id']}
+embedId: {content_info['id']}
+views: {content_info['view_count']}
+likes: {content_info['like_count']}
+image:
+  src: {content_info['thumbnail']}
+tags:
+  - {newline.join(content_info['tags'])}
+---
+"""
+
 def create_mapping_re(supported):
     return re.compile(r'{0}(?:/{0})*$'.format(r'(?:\s*\w+\s*>)?\s*(?:%s)\s*' % '|'.join(supported)))
 
@@ -205,7 +231,6 @@ def split_on_silence(audio_segment, min_silence_len=1000, silence_thresh=-50, ke
 #     chunk_files.append(out_file)
 
 video_ids = open("video_ids.txt","r").readlines()
-asr_model = nemo_asr.models.EncDecCTCModelBPE.from_pretrained(model_name="stt_en_conformer_ctc_large")
 
 if (os.path.exists("errors.json")):
     with open("errors.json", "r") as f:
@@ -213,21 +238,26 @@ if (os.path.exists("errors.json")):
 else:
     errors = []
 print(json.dumps(errors))
+asr_model = None
 for video_id in video_ids:
     if video_id.strip() == "" or os.path.exists(video_id.strip()+".json" or errors.count(video_id.strip()) > 0):
         print("Skipping "+video_id.strip())
         continue
 
-    try:
-        transcript = YouTubeTranscriptApi.get_transcript(video_id.strip())
-    except:
+    with YoutubeDL({
+        'format': 'bestaudio',
+        'outtmpl': video_id.strip() + '.%(ext)s'}) as ydl:
         try:
-            if not os.path.exists(video_id.strip()+".wav"): 
-                print("No transcript for "+video_id.strip() + " downloading audio...")
-                with YoutubeDL({
-                    'format': 'bestaudio',
-                    'outtmpl': video_id.strip() + '.%(ext)s'}) as ydl:
-                    info = ydl.extract_info(video_id.strip(), download=False)
+            info = ydl.extract_info(video_id.strip(), download=False)
+        except:
+            print("Error downloading "+video_id.strip())
+            continue
+        try:
+            transcript = YouTubeTranscriptApi.get_transcript(video_id.strip())
+        except:
+            try:
+                if not os.path.exists(video_id.strip()+".wav"): 
+                    print("No transcript for "+video_id.strip() + " downloading audio...")
                     two_days_ago = date.today() - timedelta(days=2)
                     if info["upload_date"] < two_days_ago.strftime("%Y%m%d"):
                         ydl.add_post_processor(CustomFFmpegExtractAudioPP(preferredcodec='wav', additional_ffmpeg_args=['-ac', '1', '-ar', '16000']), when='post_process')
@@ -235,43 +265,51 @@ for video_id in video_ids:
                     else:
                         print("Video is too new, skipping...")
                         continue
-        except:
-            print("Error downloading "+video_id.strip())
-            continue
+            except:
+                print("Error downloading "+video_id.strip())
+                continue
 
-        print("Splitting audio...")
-        audio = AudioSegment.from_wav(video_id.strip()+".wav")
-        audio_chunks = split_on_silence(audio, min_silence_len=300, silence_thresh=-40)
+            print("Splitting audio...")
+            audio = AudioSegment.from_wav(video_id.strip()+".wav")
+            audio_chunks = split_on_silence(audio, min_silence_len=300, silence_thresh=-40)
 
-        chunk_files = []
-        for i, chunk in enumerate(audio_chunks):
-            out_file = f"{video_id.strip()}_{chunk[1]}_{chunk[2]}.wav"
-            chunk[0].export(out_file, format="wav")
-            chunk_files.append(out_file)
-        
-        #clear audio_chunks from memory
-        del(audio_chunks)
-        del(audio)
-        gc.collect()
+            chunk_files = []
+            for i, chunk in enumerate(audio_chunks):
+                out_file = f"{video_id.strip()}_{chunk[1]}_{chunk[2]}.wav"
+                chunk[0].export(out_file, format="wav")
+                chunk_files.append(out_file)
+            
+            #clear audio_chunks from memory
+            del(audio_chunks)
+            del(audio)
+            gc.collect()
 
-        transcript = []
-        print("Running ASR...")
-        try:
-            for fname, transcription in zip(chunk_files, asr_model.transcribe(paths2audio_files=chunk_files, batch_size=BATCH_SIZE)):
-                strings = fname.split(".")[0].split("_")
-                start = int(strings[len(strings)-2])
-                end = int(strings[len(strings)-1])
-                transcript.append({"start": start/1000, "duration": (end-start)/1000, "text": transcription})
-        except:
-            errors.append(video_id.strip())
-        finally:
-            for fname in chunk_files:
-                os.remove(fname)
+            transcript = []
+            print("Running ASR...")
+            if asr_model is None:
+                asr_model = nemo_asr.models.EncDecCTCModelBPE.from_pretrained(model_name="stt_en_conformer_ctc_large")
+            try:
+                for fname, transcription in zip(chunk_files, asr_model.transcribe(paths2audio_files=chunk_files, batch_size=BATCH_SIZE)):
+                    strings = fname.split(".")[0].split("_")
+                    start = int(strings[len(strings)-2])
+                    end = int(strings[len(strings)-1])
+                    transcript.append({"start": start/1000, "duration": (end-start)/1000, "text": transcription})
+            except:
+                errors.append(video_id.strip())
+            finally:
+                for fname in chunk_files:
+                    os.remove(fname)
 
-    fout = open(video_id.strip() + '.json', 'x')
-    json.dump(transcript, fout)
-    fout.close()
-    print("Downloaded "+video_id.strip())
+        fout = open(video_id.strip() + '.json', 'x')
+        json.dump(transcript, fout)
+        fout.close()
+
+        current_foldername = os.getcwd().split(os.sep)[-1]
+        mdx_directory = '../../../../src/content/docs/en/youtube/' +  current_foldername + '/'
+        info["upload_date"] = date(int(info["upload_date"][0:4]), int(info["upload_date"][4:6]), int(info["upload_date"][6:8])).isoformat()
+        with open(mdx_directory + video_id.strip() + '.mdx', 'w') as fout:
+            fout.write(get_mdx_string(info))
+        print("Downloaded "+video_id.strip())
 error_file = open("errors.json","w")
 json.dump(errors, error_file)
 error_file.close()
