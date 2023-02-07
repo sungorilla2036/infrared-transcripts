@@ -44,11 +44,13 @@ platform: youtube
 embedId: {video_id}
 ---
 """
-    newline = '\n  - '
+    newline = '"\n  - >\n"'
+    tag_string = newline.join(content_info['tags'])
     return f"""\
 ---
-title: {content_info['title']}
-date: {content_info['upload_date']}
+title: >
+  {content_info['title']}
+date: "{content_info['upload_date']}"
 platform: youtube
 channelId: {content_info['channel_id']}
 embedId: {content_info['id']}
@@ -57,7 +59,8 @@ likes: {content_info['like_count']}
 image:
   src: {content_info['thumbnail']}
 tags:
-  - {newline.join(content_info['tags'])}
+  - >
+    "{tag_string}"
 ---
 """
 

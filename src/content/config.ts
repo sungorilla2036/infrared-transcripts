@@ -5,7 +5,7 @@ const docs = defineCollection({
 	schema: z.object({
 		title: z.string().default(SITE.title),
 		description: z.string().default(SITE.description),
-		date: z.date().optional(),
+		date: z.string().optional(),
 		platform: z.union([z.literal('youtube'), z.literal('rumble')]).optional(),
 		channelId: z.string().optional(),
 		embedId: z.string().optional(),
@@ -17,7 +17,7 @@ const docs = defineCollection({
 		image: z
 			.object({
 				src: z.string(),
-				alt: z.string(),
+				alt: z.string().default(''),
 			})
 			.optional(),
 		ogLocale: z.string().optional(),
