@@ -17,6 +17,13 @@ type Transcription = {
 
 const { headings, githubEditUrl, ...data } = Astro.props;
 let transcript: Transcription[] = [];
+if (data.embedId) {
+	console.log(Astro.url.pathname);
+	const pathComponents = Astro.url.pathname.split('/').filter(str => str !== '');
+	let url = `${Astro.url.origin}/transcripts/${pathComponents.slice(-3).join('/')}.json`;
+	console.log(url);
+	transcript = await fetch(url).then((res) => res.json());
+}
 ---
 
 <article id="article" class="content">
