@@ -8,13 +8,14 @@ import PageContent from '../components/PageContent/PageContent.astro';
 import LeftSidebar from '../components/LeftSidebar/LeftSidebar.astro';
 import RightSidebar from '../components/RightSidebar/RightSidebar.astro';
 import Footer from '../components/Footer/Footer.astro';
-import { GITHUB_EDIT_URL, SITE } from '../consts';
+import { GITHUB_EDIT_URL, Sidebar, SITE } from '../consts';
 
 type Props = CollectionEntry<'docs'>['data'] & {
 	headings: MarkdownHeading[];
+	sidebar: Sidebar;
 };
 
-const { headings, ...data } = Astro.props;
+const { headings, sidebar, ...data } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const currentPage = Astro.url.pathname;
 const currentFile = `src/content/docs${currentPage.replace(/\/$/, '')}.md`;
@@ -116,6 +117,10 @@ const githubEditUrl = `${GITHUB_EDIT_URL}/${currentFile}`;
 				display: block;
 				top: 2rem;
 			}
+
+			body {
+				padding: 0 20px 0 20px;
+			}
 		</style>
 		<link href="/_pagefind/pagefind-ui.css" rel="stylesheet">
 		<script is:inline src="/_pagefind/pagefind-ui.js" type="text/javascript"></script>
@@ -131,10 +136,10 @@ const githubEditUrl = `${GITHUB_EDIT_URL}/${currentFile}`;
 		<div id="search"></div>
 		<main class="layout">
 			<aside id="grid-left" class="grid-sidebar" title="Site Navigation">
-				<LeftSidebar currentPage={currentPage} />
+				<LeftSidebar currentPage={currentPage} sidebar={sidebar}/>
 			</aside>
 			<div id="grid-main">
-				<PageContent title={data.title} headings={headings} githubEditUrl={githubEditUrl}>
+				<PageContent headings={headings} githubEditUrl={githubEditUrl} {...data}>
 					<slot />
 				</PageContent>
 			</div>

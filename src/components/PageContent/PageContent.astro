@@ -1,20 +1,20 @@
 ---
 import type { MarkdownHeading } from 'astro';
+import type { CollectionEntry } from 'astro:content';
 import MoreMenu from '../RightSidebar/MoreMenu.astro';
 import TableOfContents from '../RightSidebar/TableOfContents';
 
-type Props = {
-	title: string;
+type Props = CollectionEntry<'docs'>['data'] & {
 	headings: MarkdownHeading[];
 	githubEditUrl: string;
 };
 
-const { title, headings, githubEditUrl } = Astro.props;
+const { headings, githubEditUrl, ...data } = Astro.props;
 ---
 
 <article id="article" class="content">
 	<section class="main-section">
-		<h1 class="content-title" id="overview">{title}</h1>
+		<h1 class="content-title" id="overview">{data.title}</h1>
 		<nav class="block sm:hidden">
 			<TableOfContents client:media="(max-width: 50em)" headings={headings} />
 		</nav>

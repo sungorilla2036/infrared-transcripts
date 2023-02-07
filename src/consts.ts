@@ -1,3 +1,5 @@
+import { getCollection } from "astro:content";
+
 export const SITE = {
 	title: 'Infrared Content Catalog',
 	description: 'Unleash the forces of content production',
@@ -27,12 +29,3 @@ export type Sidebar = Record<
 	(typeof KNOWN_LANGUAGE_CODES)[number],
 	Record<string, { text: string; link: string }[]>
 >;
-
-const transcriptFolders = ['../Black Lenin', '../Infrared', '../Infrared VODs']
-export const SIDEBAR: Sidebar = {
-	en: {
-		'': [
-			{ text: 'Introduction', link: 'en/introduction' },
-		],
-	},
-};
