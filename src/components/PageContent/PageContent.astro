@@ -9,7 +9,19 @@ type Props = CollectionEntry<'docs'>['data'] & {
 	githubEditUrl: string;
 };
 
+type Transcription = {
+	start: number;
+	end: number;
+	text: string;
+};
+
 const { headings, githubEditUrl, ...data } = Astro.props;
+let transcript = [];
+if (data.embedId) {
+const pathComponents = Astro.url.pathname.split('/');
+pathComponents[pathComponents.length - 1] = data.embedId;
+transcript = await fetch(Astro.url.origin +'/transcripts/' + pathComponents.slice(-3).join('/') + '.json').then((res) => res.json());
+}
 ---
 
 <article id="article" class="content">
@@ -18,6 +30,27 @@ const { headings, githubEditUrl, ...data } = Astro.props;
 		<nav class="block sm:hidden">
 			<TableOfContents client:media="(max-width: 50em)" headings={headings} />
 		</nav>
+		{data.platform === "youtube" && (
+			<div class="video-container">
+				<iframe
+					src={`https://www.youtube.com/embed/${data.embedId}?enablejsapi=1`}
+					frameborder="0"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+					allowfullscreen
+				></iframe>
+			</div>
+			<div class="transcript-container">
+				{transcript.map((item:Transcription) =>(
+					<div onclick={"seekTo(" + item.start + ")"}>{item.text}</div>
+				))}
+				<script is:inline>
+					function seekTo(time) {
+						const player = document.querySelector('iframe').contentWindow;
+						player.postMessage('{"event":"command","func":"seekTo","args":[' + time + ']}', '*');
+					}
+				</script>
+			</div>
+		)}
 		<slot />
 	</section>
 	<nav class="block sm:hidden">
@@ -26,6 +59,10 @@ const { headings, githubEditUrl, ...data } = Astro.props;
 </article>
 
 <style>
+	.transcript-container {
+		max-height: 300px;
+		overflow-y: scroll;
+	}
 	.content {
 		padding: 0;
 		max-width: 75ch;
