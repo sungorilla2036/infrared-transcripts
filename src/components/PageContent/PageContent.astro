@@ -16,13 +16,16 @@ type Transcription = {
 };
 
 const { headings, githubEditUrl, ...data } = Astro.props;
-let transcript = [];
+let transcript: Transcription[] = [];
 if (data.embedId) {
 	const pathComponents = Astro.url.pathname.split('/');
 	pathComponents[pathComponents.length - 1] = data.embedId;
-	const jsonFile = Astro.url.origin +'/transcripts/' + pathComponents.slice(-3).join('/') + '.json';
-	console.log(jsonFile);
-	transcript = await fetch(jsonFile).then((res) => res.json());
+	let url = `${Astro.url.origin}/transcripts/${pathComponents.slice(-3).join('/')}.json`;
+	if (import.meta.env.PROD) {
+		url = `./public/transcripts/${pathComponents.slice(-3).join('/')}.json`;
+	}
+	console.log(url);
+	transcript = await fetch(url).then((res) => res.json());
 }
 ---
 

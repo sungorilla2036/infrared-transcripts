@@ -12,5 +12,5 @@ export default defineConfig({
   preact(),
   // Enable React for the Algolia search component.
   react(), mdx()],
-  site: `https://astro.build`
+  site: `https://infrared-transcripts.pages.dev`
 });
