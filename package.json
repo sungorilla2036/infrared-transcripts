@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build --experimental-static-build",
+    "build": "astro build",
     "postbuild": "pagefind --source dist",
     "preview": "astro preview",
     "astro": "astro"
