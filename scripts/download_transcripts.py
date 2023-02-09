@@ -243,42 +243,43 @@ else:
 print(json.dumps(errors))
 asr_model = None
 for video_id in video_ids:
-    if video_id.strip() == "" or os.path.exists(video_id.strip()+".json" or errors.count(video_id.strip()) > 0):
-        print("Skipping "+video_id.strip())
+    video_id = video_id.strip()
+    if video_id == "" or os.path.exists(video_id+".json" or errors.count(video_id) > 0):
+        print("Skipping "+video_id)
         continue
 
     with YoutubeDL({
         'format': 'bestaudio',
-        'outtmpl': video_id.strip() + '.%(ext)s'}) as ydl:
+        'outtmpl': video_id + '.%(ext)s'}) as ydl:
         try:
-            info = ydl.extract_info(video_id.strip(), download=False)
+            info = ydl.extract_info(video_id, download=False)
         except:
-            print("Error downloading "+video_id.strip())
+            print("Error downloading "+video_id)
             continue
         try:
-            transcript = YouTubeTranscriptApi.get_transcript(video_id.strip())
+            transcript = YouTubeTranscriptApi.get_transcript(video_id)
         except:
             try:
-                if not os.path.exists(video_id.strip()+".wav"): 
-                    print("No transcript for "+video_id.strip() + " downloading audio...")
+                if not os.path.exists(video_id+".wav"): 
+                    print("No transcript for "+video_id + " downloading audio...")
                     two_days_ago = date.today() - timedelta(days=2)
                     if info["upload_date"] < two_days_ago.strftime("%Y%m%d"):
                         ydl.add_post_processor(CustomFFmpegExtractAudioPP(preferredcodec='wav', additional_ffmpeg_args=['-ac', '1', '-ar', '16000']), when='post_process')
-                        ydl.download(['https://www.youtube.com/watch?v='+video_id.strip()])
+                        ydl.download(['https://www.youtube.com/watch?v='+video_id])
                     else:
                         print("Video is too new, skipping...")
                         continue
             except:
-                print("Error downloading "+video_id.strip())
+                print("Error downloading "+video_id)
                 continue
 
             print("Splitting audio...")
-            audio = AudioSegment.from_wav(video_id.strip()+".wav")
+            audio = AudioSegment.from_wav(video_id+".wav")
             audio_chunks = split_on_silence(audio, min_silence_len=300, silence_thresh=-40)
 
             chunk_files = []
             for i, chunk in enumerate(audio_chunks):
-                out_file = f"{video_id.strip()}_{chunk[1]}_{chunk[2]}.wav"
+                out_file = f"{video_id}_{chunk[1]}_{chunk[2]}.wav"
                 chunk[0].export(out_file, format="wav")
                 chunk_files.append(out_file)
             
@@ -298,21 +299,21 @@ for video_id in video_ids:
                     end = int(strings[len(strings)-1])
                     transcript.append({"start": start/1000, "duration": (end-start)/1000, "text": transcription})
             except:
-                errors.append(video_id.strip())
+                errors.append(video_id)
             finally:
                 for fname in chunk_files:
                     os.remove(fname)
 
-        fout = open(video_id.strip() + '.json', 'x')
+        fout = open(video_id + '.json', 'x')
         json.dump(transcript, fout)
         fout.close()
 
         current_foldername = os.getcwd().split(os.sep)[-1]
         mdx_directory = '../../../../src/content/docs/en/youtube/' +  current_foldername + '/'
         info["upload_date"] = date(int(info["upload_date"][0:4]), int(info["upload_date"][4:6]), int(info["upload_date"][6:8])).isoformat()
-        with open(mdx_directory + video_id.strip() + '.mdx', 'x') as fout:
-            fout.write(get_mdx_string(info))
-        print("Downloaded "+video_id.strip())
+        with open(mdx_directory + video_id + '.mdx', 'x') as fout:
+            fout.write(get_mdx_string(info, video_id))
+        print("Downloaded "+video_id)
 error_file = open("errors.json","w")
 json.dump(errors, error_file)
 error_file.close()
