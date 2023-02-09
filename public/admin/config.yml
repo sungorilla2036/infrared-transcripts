@@ -1,0 +1,32 @@
+backend:
+  name: git-gateway
+  branch: master # Branch to update (optional; defaults to master)
+# This line should *not* be indented
+publish_mode: editorial_workflow
+# This line should *not* be indented
+media_folder: "public/images/uploads" # Media files will be stored in the repo under images/uploads
+public_folder: "/images/uploads" # The src attribute for uploaded media will begin with /images/uploads
+site_url: "https://infrared-transcripts.pages.dev"
+collections:
+  - name: "video" # Used in routes, e.g., /admin/collections/blog
+    label: "Video" # Used in the UI
+    identifier_field: embedId
+    folder: "src/content/docs/en" # The path to the folder where the documents are stored
+    create: true # Allow users to create new documents in this collection
+    slug: "{{slug}}" # Filename template, e.g., YYYY-MM-DD-title.md
+    fields: # The fields for each document, usually in front matter
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Publish Date", name: "date", widget: "date", required: false}
+      - {label: "Platform", name: "platform", widget: "string", required: false}
+      - {label: "Channel ID", name: "channelId", widget: "string", required: false}
+      - {label: "Video ID", name: "embedId", widget: "string", required: false}
+      - {label: "View Count", name: "views", widget: "number", required: false}
+      - {label: "Like Count", name: "likes", widget: "number", required: false}
+      - label: "Featured Image"
+        required: false
+        name: "image"
+        widget: "object"
+        fields:
+          - {label: "Source", name: "src", widget: "image"}
+      - {label: "Tags", name: "tags", widget: "list", required: false}
+      - {label: "Body", name: "body", widget: "markdown"}
