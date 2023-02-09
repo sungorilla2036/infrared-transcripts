@@ -310,7 +310,7 @@ for video_id in video_ids:
         current_foldername = os.getcwd().split(os.sep)[-1]
         mdx_directory = '../../../../src/content/docs/en/youtube/' +  current_foldername + '/'
         info["upload_date"] = date(int(info["upload_date"][0:4]), int(info["upload_date"][4:6]), int(info["upload_date"][6:8])).isoformat()
-        with open(mdx_directory + video_id.strip() + '.mdx', 'w') as fout:
+        with open(mdx_directory + video_id.strip() + '.mdx', 'x') as fout:
             fout.write(get_mdx_string(info))
         print("Downloaded "+video_id.strip())
 error_file = open("errors.json","w")
