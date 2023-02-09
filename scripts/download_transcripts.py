@@ -44,7 +44,7 @@ platform: youtube
 embedId: {video_id}
 ---
 """
-    newline = '"\n  - >\n"'
+    newline = '"\n  - >\n    "'
     tag_string = newline.join(content_info['tags'])
     return f"""\
 ---
