@@ -3,6 +3,7 @@ import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import MoreMenu from '../RightSidebar/MoreMenu.astro';
 import TableOfContents from '../RightSidebar/TableOfContents';
+import * as fs from 'node:fs';
 
 type Props = CollectionEntry<'docs'>['data'] & {
 	headings: MarkdownHeading[];
@@ -21,9 +22,8 @@ if (data.embedId) {
 	console.log(Astro.url.pathname);
 	const pathComponents = Astro.url.pathname.split('/').filter(str => str !== '');
 	pathComponents[pathComponents.length-1] = data.embedId;
-	let url = `${Astro.url.origin}/transcripts/${pathComponents.slice(-3).join('/')}.json`;
-	console.log(url);
-	transcript = await fetch(url).then((res) => res.json());
+	let url = `public/transcripts/${pathComponents.slice(-3).join('/')}.json`;
+	transcript = JSON.parse(fs.readFileSync(url, 'utf8'));
 }
 ---
 
