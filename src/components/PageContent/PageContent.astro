@@ -30,6 +30,8 @@ if (data.embedId) {
 <article id="article" class="content">
 	<section class="main-section">
 		<h1 class="content-title" id="overview" data-pagefind-meta="title">{data.title}</h1>
+		<div data-pagefind-meta="date">{data.date}</div>
+		<div>Tags: {data.tags.map((tag:string) => <a>{tag}</a>)}</div>
 		<nav class="block sm:hidden">
 			<TableOfContents client:media="(max-width: 50em)" headings={headings} />
 		</nav>
@@ -44,7 +46,7 @@ if (data.embedId) {
 			</div>
 			<div class="transcript-container">
 				{transcript.map((item:Transcription) =>(
-					<div onclick={"seekTo(" + item.start + ")"}>{item.text}</div>
+					<div class="transcript-item" onclick={"seekTo(" + item.start + ")"}>{item.text}</div>
 				))}
 				<script is:inline>
 					function seekTo(time) {
@@ -62,6 +64,13 @@ if (data.embedId) {
 </article>
 
 <style>
+	.transcript-item {
+		cursor: pointer;
+	}
+
+	.transcript-item:hover {
+		background-color: #f5f5f5;
+	}
 	.transcript-container {
 		max-height: 300px;
 		overflow-y: scroll;
