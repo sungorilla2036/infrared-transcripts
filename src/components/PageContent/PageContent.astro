@@ -31,7 +31,7 @@ if (data.embedId) {
 	<section class="main-section">
 		<h1 class="content-title" id="overview" data-pagefind-meta="title">{data.title}</h1>
 		<div data-pagefind-meta="date">{data.date}</div>
-		<div>Tags: {data.tags.map((tag:string) => <a>{tag}</a>)}</div>
+		{data.tags.length > 0 && (<div>Tags: {data.tags.map((tag:string) => <a>{tag}</a>)}</div>)}
 		<nav class="block sm:hidden">
 			<TableOfContents client:media="(max-width: 50em)" headings={headings} />
 		</nav>
