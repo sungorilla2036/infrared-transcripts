@@ -213,5 +213,5 @@ yarg==0.1.9
 yarl==1.8.1
 youtokentome==1.0.6
 youtube-transcript-api==0.4.4
-yt-dlp==2022.9.1
+yt-dlp==2023.2.17
 zipp==3.8.1
