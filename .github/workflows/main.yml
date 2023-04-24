@@ -30,9 +30,7 @@ jobs:
         with:
           python-version: '3.7'
           cache: 'pip' # caching pip dependencies
-      - run: |
-          pip install fasttext-wheel==0.9.2
-          pip install -r requirements.txt
+      - run: pip install -r requirements.txt
         working-directory: scripts
 
       - name: Cache ML model
