@@ -1,6 +1,5 @@
 {
   "name": "@example/docs",
-  "type": "module",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -17,6 +16,8 @@
     "react-dom": "^18.1.0"
   },
   "devDependencies": {
-    "html-escaper": "^3.0.3"
+    "@types/node": "20.2.5",
+    "html-escaper": "^3.0.3",
+    "typescript": "5.1.3"
   }
 }
