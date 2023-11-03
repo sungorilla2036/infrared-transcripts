@@ -1,100 +1,149 @@
 ---
-import type { MarkdownHeading } from 'astro';
-import type { CollectionEntry } from 'astro:content';
-import MoreMenu from '../RightSidebar/MoreMenu.astro';
-import TableOfContents from '../RightSidebar/TableOfContents';
-import * as fs from 'node:fs';
+import type { MarkdownHeading } from "astro";
+import type { CollectionEntry } from "astro:content";
+import MoreMenu from "../RightSidebar/MoreMenu.astro";
+import TableOfContents from "../RightSidebar/TableOfContents";
+import * as fs from "node:fs";
 
-type Props = CollectionEntry<'docs'>['data'] & {
-	headings: MarkdownHeading[];
-	githubEditUrl: string;
+type Props = CollectionEntry<"docs">["data"] & {
+  headings: MarkdownHeading[];
+  githubEditUrl: string;
 };
 
 type Transcription = {
-	start: number;
-	end: number;
-	text: string;
+  start: number;
+  end: number;
+  text: string;
 };
 
 const { headings, githubEditUrl, ...data } = Astro.props;
 let transcript: Transcription[] = [];
 if (data.embedId) {
-	console.log(Astro.url.pathname);
-	const pathComponents = Astro.url.pathname.split('/').filter(str => str !== '');
-	pathComponents[pathComponents.length-1] = data.embedId;
-	let url = `public/transcripts/${pathComponents.slice(-3).join('/')}.json`;
-	transcript = JSON.parse(fs.readFileSync(url, 'utf8'));
+  console.log(Astro.url.pathname);
+  const pathComponents = Astro.url.pathname
+    .split("/")
+    .filter((str) => str !== "");
+  pathComponents[pathComponents.length - 1] = data.embedId;
+  let url = `public/transcripts/${pathComponents.slice(-3).join("/")}.json`;
+  transcript = JSON.parse(fs.readFileSync(url, "utf8"));
 }
 ---
 
 <article id="article" class="content">
-	<section class="main-section">
-		<h1 class="content-title" id="overview" data-pagefind-meta="title">{data.title}</h1>
-		<div data-pagefind-meta="date">{data.date}</div>
-		{data.tags.length > 0 && (<div>Tags: {data.tags.map((tag:string) => <a>{tag}</a>)}</div>)}
-		<nav class="block sm:hidden">
-			<TableOfContents client:media="(max-width: 50em)" headings={headings} />
-		</nav>
-		{data.platform === "youtube" && (
-			<div class="video-container">
-				<iframe
-					src={`https://www.youtube.com/embed/${data.embedId}?enablejsapi=1`}
-					frameborder="0"
-					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-					allowfullscreen
-				></iframe>
-			</div>
-			<div class="transcript-container">
-				{transcript.map((item:Transcription) =>(
-					<div class="transcript-item" onclick={"seekTo(" + item.start + ")"}>{item.text}</div>
-				))}
-				<script is:inline>
-					function seekTo(time) {
-						const player = document.querySelector('iframe').contentWindow;
-						player.postMessage('{"event":"command","func":"seekTo","args":[' + time + ']}', '*');
-					}
-				</script>
-			</div>
-		)}
-		<slot />
-	</section>
-	<nav class="block sm:hidden">
-		<MoreMenu editHref={githubEditUrl} />
-	</nav>
+  <section class="main-section">
+    <h1 class="content-title" id="overview" data-pagefind-meta="title">
+      {data.title}
+    </h1>
+    <div data-pagefind-meta="date">{data.date}</div>
+    {
+      data.tags.length > 0 && (
+        <div>
+          Tags:{" "}
+          {data.tags.map((tag: string) => (
+            <a>{tag}</a>
+          ))}
+        </div>
+      )
+    }
+    <nav class="block sm:hidden">
+      <TableOfContents client:media="(max-width: 50em)" headings={headings} />
+    </nav>
+    <div class="video-container">
+      {
+        data.platform === "youtube" && (
+          <iframe
+            src={`https://www.youtube.com/embed/${data.embedId}?enablejsapi=1`}
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          />
+        )
+      }
+      {
+        data.platform === "kick" && (
+          <script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+          <video width="600" height="400" controls>
+            <source src={data.sourceUrl} type="application/x-mpegURL" />
+          </video>
+        )
+      }
+    </div>
+    <div class="transcript-container">
+      {
+        transcript.map((item: Transcription) => (
+          <div class="transcript-item" onclick={"seekTo(" + item.start + ")"}>
+            {item.text}
+          </div>
+        ))
+      }
+    </div>
+    { data.platform === "youtube" && (
+      <script is:inline>
+        function seekTo(time) {
+          const player = document.querySelector("iframe").contentWindow;
+          player.postMessage(
+            '{"event":"command","func":"seekTo","args":[' + time + "]}",
+            "*"
+          );
+        }
+      </script>
+      )}
+      { data.platform === "kick" && (
+      <script is:inline>
+        const video = document.querySelector("video");
+        const source = video.querySelector("source");
+        if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = source.src;
+        } else if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(source.src);
+          hls.attachMedia(video);
+        }
+        function seekTo(time) {
+          const video = document.querySelector("video");
+          video.currentTime = time;
+        }
+      </script>
+      )}
+    <slot />
+  </section>
+  <nav class="block sm:hidden">
+    <MoreMenu editHref={githubEditUrl} />
+  </nav>
 </article>
 
 <style>
-	.transcript-item {
-		cursor: pointer;
-	}
+  .transcript-item {
+    cursor: pointer;
+  }
 
-	.transcript-item:hover {
-		background-color: #f5f5f5;
-	}
-	.transcript-container {
-		max-height: 300px;
-		overflow-y: scroll;
-	}
-	.content {
-		padding: 0;
-		max-width: 75ch;
-		width: 100%;
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-	}
+  .transcript-item:hover {
+    background-color: #f5f5f5;
+  }
+  .transcript-container {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+  .content {
+    padding: 0;
+    max-width: 75ch;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-	.content > section {
-		margin-bottom: 4rem;
-	}
+  .content > section {
+    margin-bottom: 4rem;
+  }
 
-	.block {
-		display: block;
-	}
+  .block {
+    display: block;
+  }
 
-	@media (min-width: 50em) {
-		.sm\:hidden {
-			display: none;
-		}
-	}
+  @media (min-width: 50em) {
+    .sm\:hidden {
+      display: none;
+    }
+  }
 </style>
