@@ -139,7 +139,6 @@ transcriber = pipeline(
     feature_extractor=processor.feature_extractor,
     max_new_tokens=128,
     chunk_length_s=20,
-    batch_size=2,
     torch_dtype=torch_dtype,
     device=device,
 )
