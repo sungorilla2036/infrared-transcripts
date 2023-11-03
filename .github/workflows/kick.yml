@@ -30,9 +30,7 @@ jobs:
         with:
           python-version: "3.10"
           cache: "pip" # caching pip dependencies
-      - run: python -m pip install pip --upgrade
-      - run: pip install Cython
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements_kick.txt
         working-directory: scripts
 
       - name: Cache ML model

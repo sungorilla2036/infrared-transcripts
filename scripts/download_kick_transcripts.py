@@ -2,12 +2,13 @@ import subprocess
 from curl_cffi import requests
 import json
 import os
-import gc
+
 # NeMo model
-import nemo.collections.asr as nemo_asr
-import re
-from pydub import AudioSegment
-from pydub.silence import detect_nonsilent
+# import gc
+# import nemo.collections.asr as nemo_asr
+# from pydub import AudioSegment
+# from pydub.silence import detect_nonsilent
+
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 
