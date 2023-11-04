@@ -146,7 +146,10 @@ transcriber = pipeline(
 result = transcriber(uuid + ".wav", return_timestamps=True)
 for chunk in result['chunks']:
     chunk['start'] = chunk['timestamp'][0]
-    chunk['duration'] = chunk['timestamp'][1] - chunk['timestamp'][0]
+    if chunk['timestamp'][1]:
+        chunk['duration'] = chunk['timestamp'][1] - chunk['timestamp'][0]
+    else:
+        chunk['duration'] = 0
     del(chunk['timestamp'])
 transcript = result['chunks']
 
