@@ -2,14 +2,12 @@ import subprocess
 from curl_cffi import requests
 import json
 import os
-import numpy as np
-import time
 
 # NeMo model
 # import gc
 # import nemo.collections.asr as nemo_asr
-from pydub import AudioSegment
-from pydub.silence import detect_nonsilent
+# from pydub import AudioSegment
+# from pydub.silence import detect_nonsilent
 
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
@@ -94,9 +92,20 @@ def split_on_silence(audio_segment, min_silence_len=1000, silence_thresh=-50, ke
 
     return chunks
 
-print("Splitting audio...")
-audio = AudioSegment.from_wav(uuid + ".wav")
-audio_chunks = split_on_silence(audio, min_silence_len=300, silence_thresh=-40)
+# print("Splitting audio...")
+# audio = AudioSegment.from_wav(uuid + ".wav")
+# audio_chunks = split_on_silence(audio, min_silence_len=300, silence_thresh=-40)
+
+# chunk_files = []
+# for i, chunk in enumerate(audio_chunks):
+#     out_file = f"{uuid}_{chunk[1]}_{chunk[2]}.wav"
+#     chunk[0].export(out_file, format="wav")
+#     chunk_files.append(out_file)
+
+# #clear audio_chunks from memory
+# del(audio_chunks)
+# del(audio)
+# gc.collect()
 
 transcript = []
 print("Running ASR...")
@@ -129,20 +138,23 @@ transcriber = pipeline(
     tokenizer=processor.tokenizer,
     feature_extractor=processor.feature_extractor,
     max_new_tokens=128,
+    chunk_length_s=20,
     torch_dtype=torch_dtype,
     device=device,
 )
 
-start_time = time.time()
-for audio_chunk in audio_chunks:
-    result = transcriber(np.array(audio_chunk[0].get_array_of_samples()).T.astype(np.float32)/32768.0)
-    transcript.append(result['text'])
-end_time = time.time()
-elapsed_time = end_time - start_time
-print(f"Elapsed time: {elapsed_time:.2f} seconds")
+result = transcriber(uuid + ".wav", return_timestamps=True)
+for chunk in result['chunks']:
+    chunk['start'] = chunk['timestamp'][0]
+    if chunk['timestamp'][1]:
+        chunk['duration'] = chunk['timestamp'][1] - chunk['timestamp'][0]
+    else:
+        chunk['duration'] = 0
+    del(chunk['timestamp'])
+transcript = result['chunks']
 
 fout= open(TRANSCRIPTS_FOLDER + uuid + '.json', 'x')
-json.dump([{"start": audio_chunks[i][1]/1000, "duration": (audio_chunks[i][2]-audio_chunks[i][1])/1000, "text": text} for i, text in enumerate(transcript)], fout)
+json.dump(transcript, fout)
 fout.close()
 
 mdx_directory = 'src/content/docs/en/kick/infrared/'
