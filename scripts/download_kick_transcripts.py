@@ -38,32 +38,32 @@ response = requests.get("https://kick.com/api/v1/video/" + uuid,  impersonate="c
 res_json = response.json()
 stream_url = res_json['source']
 print(stream_url)
-# print('Downloading stream')
-# subprocess.call([
-#     'yt-dlp',
-#     '-f',
-#     'worst',
-#     '-x',
-#     '--audio-format',
-#     'wav',
-#     '-o',
-#     'temp.wav',
-#     stream_url,
-# ])
+print('Downloading stream')
+subprocess.call([
+    'yt-dlp',
+    '-f',
+    'worst',
+    '-x',
+    '--audio-format',
+    'wav',
+    '-o',
+    'temp.wav',
+    stream_url,
+])
 
-# print('Converting to 16Khz mono wav')
-# subprocess.call([
-#     'ffmpeg',
-#     '-i',
-#     'temp.wav',
-#     '-ac',
-#     '1',
-#     '-ar',
-#     '16000',
-#     uuid + '.wav',
-# ])
+print('Converting to 16Khz mono wav')
+subprocess.call([
+    'ffmpeg',
+    '-i',
+    'temp.wav',
+    '-ac',
+    '1',
+    '-ar',
+    '16000',
+    uuid + '.wav',
+])
 
-# os.remove('temp.wav')
+os.remove('temp.wav')
 
 def split_on_silence(audio_segment, min_silence_len=1000, silence_thresh=-50, keep_silence=100, max_segment_len=25000):
     """
