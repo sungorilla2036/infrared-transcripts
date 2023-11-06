@@ -2,6 +2,7 @@ import subprocess
 from curl_cffi import requests
 import json
 import os
+import sys
 
 # NeMo model
 # import gc
@@ -27,6 +28,11 @@ for stream in streams:
     if not os.path.exists(TRANSCRIPTS_FOLDER + uuid + ".json"):
         print(uuid)
         break
+    else:
+        uuid = None
+
+if not uuid:
+    sys.exit()
 
 del(streams)
 del(response_json_obj)
