@@ -9,20 +9,33 @@ export async function getStaticPaths() {
 		'en':{},
 	}
 	for (const doc of docs) {
-	console.log(doc.slug);
-	const pathComponents = doc.slug.split('/');
-	let category = '';
-	if (pathComponents.length > 2) {
-		category = pathComponents[2] + ' - ' + pathComponents[1];
+		console.log(doc.slug);
+		const pathComponents = doc.slug.split('/');
+		let category = '';
+		if (pathComponents.length > 2) {
+			category = pathComponents[2] + ' - ' + pathComponents[1];
+		}
+		if (sidebar['en'][category] === undefined) {
+			sidebar['en'][category] = [];
+		}
+        const dateStr = doc.data.date ? doc.data.date.substring(0, 10) : '';
+		sidebar['en'][category].push({
+			text: dateStr + ' ' + doc.data.title,
+			link: doc.slug,
+			date: dateStr,
+		});
+
+		// sort by date
+		sidebar['en'][category].sort((a, b) => {
+			if (a.date < b.date) {
+				return 1;
+			}
+			if (a.date > b.date) {
+				return -1;
+			}
+			return 0;
+		});
 	}
-	if (sidebar['en'][category] === undefined) {
-		sidebar['en'][category] = [];
-	}
-	sidebar['en'][category].push({
-		text: doc.data.title,
-		link: doc.slug,
-	});
-}
 	return docs.map((entry) => ({
 		params: {
 			slug: entry.slug,
