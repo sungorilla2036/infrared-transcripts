@@ -18,7 +18,7 @@ TRANSCRIPTS_FOLDER = "public/transcripts/kick/infrared/"
 
 print('Getting channel info...')
 
-response = requests.get(channel_info,  impersonate="chrome101")
+response = requests.get(channel_info,  impersonate="chrome110")
 response_json_obj = response.json()
 
 streams = response_json_obj['previous_livestreams']

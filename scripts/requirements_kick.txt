@@ -4,7 +4,7 @@ certifi==2023.7.22
 cffi==1.16.0
 charset-normalizer==3.3.2
 colorama==0.4.6
-curl-cffi==0.5.9
+curl-cffi==0.5.10
 filelock==3.13.1
 fsspec==2023.10.0
 huggingface-hub==0.17.3
