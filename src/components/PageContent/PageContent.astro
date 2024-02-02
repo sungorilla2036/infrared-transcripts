@@ -71,7 +71,7 @@ if (data.embedId) {
     <div class="transcript-container">
       {
         transcript.map((item: Transcription) => (
-          <div class="transcript-item" onclick={"seekTo(" + item.start + ")"}>
+          <div class="transcript-item" onclick={"seekTo(" + item.start + ")"} title={new Date(item.start * 1000).toISOString().slice(11, 19) + "-" + new Date((item.start + item.duration) * 1000).toISOString().slice(11, 19)}>
             {item.text}
           </div>
         ))
